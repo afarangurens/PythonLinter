@@ -1,7 +1,7 @@
 from antlr4 import *
 from Python3Lexer import Python3Lexer
 from Python3Parser import Python3Parser
-from test_context_listener import TestContextListener
+from class_naming_convention_listener import ClassNamingConventionListener
 
 def main():
     input = FileStream("test.py")
@@ -10,7 +10,7 @@ def main():
     parser = Python3Parser(stream)
     tree = parser.file_input()
 
-    file_input_listener = TestContextListener()
+    file_input_listener = ClassNamingConventionListener()
     walker = ParseTreeWalker()
     walker.walk(file_input_listener, tree)
 
