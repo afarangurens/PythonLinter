@@ -1,7 +1,7 @@
 from antlr4 import *
 from Python3Lexer import Python3Lexer
 from Python3Parser import Python3Parser
-from Python3Listener import Python3Listener
+from test_context_listener import TestContextListener
 
 def main():
     input = FileStream("test.py")
@@ -10,7 +10,9 @@ def main():
     parser = Python3Parser(stream)
     tree = parser.file_input()
 
-    print(tree)
+    file_input_listener = TestContextListener()
+    walker = ParseTreeWalker()
+    walker.walk(file_input_listener, tree)
 
 
 if __name__ == '__main__':

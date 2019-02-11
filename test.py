@@ -1,5 +1,4 @@
 import sys 
 
-print("hi")
-print("hey")
-print("hello")
+class Clase:
+    print("hi tenquiu")
