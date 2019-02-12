@@ -1,5 +1,4 @@
 import sys 
 
-
-class Clase:
+class asd:
     print("")
