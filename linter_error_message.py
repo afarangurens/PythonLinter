@@ -43,7 +43,7 @@ class LinterErrorMessage:
 
         print("Style Error {}, the variable name {} is in the list of 'names"
               " to avoid' in python ('l', 'O', I)".format(error_position,
-                                                          func_name))
+                                                          var_name))
     def const_naming_error():
         error_position = self.show_error_position(token)
 
