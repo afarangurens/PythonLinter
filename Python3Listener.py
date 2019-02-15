@@ -109,7 +109,6 @@ class Python3Listener(ParseTreeListener):
 
     # Enter a parse tree produced by Python3Parser#varargslist.
     def enterVarargslist(self, ctx:Python3Parser.VarargslistContext):
-        print("var")
         pass
 
     # Exit a parse tree produced by Python3Parser#varargslist.
@@ -119,7 +118,6 @@ class Python3Listener(ParseTreeListener):
 
     # Enter a parse tree produced by Python3Parser#vfpdef.
     def enterVfpdef(self, ctx:Python3Parser.VfpdefContext):
-        print("var2")
         pass
 
     # Exit a parse tree produced by Python3Parser#vfpdef.

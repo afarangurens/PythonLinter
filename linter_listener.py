@@ -8,6 +8,7 @@ from Python3Parser import Python3Parser
 from Python3Listener import Python3Listener
 from linter_error_message import LinterErrorMessage
 from token_handler import TokenHandler
+from style_convention_check import StyleConventionCheck
 
 
 class LinterListener(Python3Listener):
@@ -16,62 +17,61 @@ class LinterListener(Python3Listener):
         self.variable = True
         self.token_stream = token_stream
         
-        self.token_handler = TokenHandler()
-        self.linter_error_message = LinterErrorMessage()        
+        self.token_handler = TokenHandler
+        self.linter_error_message = LinterErrorMessage()
+        self.convention_checker = StyleConventionCheck 
         
         print("initializing context test with listener...")
-    
-    def enterAtom(self, ctx:Python3Parser.FuncdefContext):
-        pass
 
-    def exitAtom(self, ctx:Python3Parser.FuncdefContext):
+    def exitAtom(self, ctx:Python3Parser.AtomContext):
         
-        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx)
-           
+        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx, 0)
+    
         var_name = str(ctx.NAME())
+        lower_case_regex = "([a-z][a-z0-9_]*)+"
 
         if var_name != "None":
-            
+
             # Lower case validation for variables PEP8
-            lower_case_regex = re.compile("([a-z][a-z0-9_]+)+")
-            
-            if "INVALID" in var_name:
-                pass
-            elif lower_case_regex.match(var_name) is None:
-                self.linter_error_message.variable_naming_error(var_name, 
-                                                                actual_token)
+            var_naming_error = self.linter_error_message.variable_naming_error(
+                                                                    var_name, 
+                                                                    actual_token)
+            self.convention_checker.check_naming_convention(var_name,
+                                                            lower_case_regex,
+                                                            var_naming_error)
 
             # Names to avoid validation for variables PEP8
-
             if var_name == "l" or var_name == "O" or var_name == "I":
                 self.linter_error_message.name_to_avoid_error(var_name,
                                                               actual_token)
-    def enterClassdef(self, ctx:Python3Parser.ClassdefContext):
-        pass
 
     def exitClassdef(self, ctx:Python3Parser.ClassdefContext):
-        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx)
+        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx, 1)
         
         class_name = str(ctx.NAME())
-        camel_case_regex = re.compile("([A-Z][a-z0-9]*)+")
+        camel_case_regex = "([A-Z][a-z0-9]*)+"
+        class_naming_error = self.linter_error_message.class_naming_error(
+                                                                class_name, 
+                                                                actual_token)
+                                                                
+        self.convention_checker.check_naming_convention(class_name,
+                                                        camel_case_regex,
+                                                        class_naming_error)
         
-        if "INVALID" in class_name:
-            pass
-        elif camel_case_regex.match(class_name) is None:
-            self.linter_error_message.class_naming_error(class_name, 
-                                                         actual_token)
+        
             
-    def enterFuncdef(self, ctx:Python3Parser.FuncdefContext):
-        pass
 
     def exitFuncdef(self, ctx:Python3Parser.FuncdefContext):
-        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx)
-           
-        func_name = str(ctx.NAME())
-        lower_case_regex = re.compile("([a-z][a-z0-9_]+)+")
+        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx, 1)
         
-        if "INVALID" in func_name:
-            pass
-        elif lower_case_regex.match(func_name) is None:
-            self.linter_error_message.function_naming_error(func_name, 
-                                                            actual_token)
+        func_name = str(ctx.NAME())
+        lower_case_regex = re.compile("([a-z][a-z0-9_]*)+")
+        func_naming_error = self.linter_error_message.function_naming_error(
+                                                                func_name, 
+                                                                actual_token)
+
+        self.convention_checker.check_naming_convention(func_name,
+                                                        lower_case_regex,
+                                                        func_naming_error)
+
+            
