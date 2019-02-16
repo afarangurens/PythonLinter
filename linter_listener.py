@@ -25,7 +25,9 @@ class LinterListener(Python3Listener):
 
     def exitAtom(self, ctx:Python3Parser.AtomContext):
         
-        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx, 0)
+        actual_token = str(self.token_handler.get_actual_token(
+                                                        self.token_stream,
+                                                        ctx, 0))
     
         var_name = str(ctx.NAME())
         lower_case_regex = "([a-z][a-z0-9_]*)+"
@@ -46,7 +48,9 @@ class LinterListener(Python3Listener):
                                                               actual_token)
 
     def exitClassdef(self, ctx:Python3Parser.ClassdefContext):
-        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx, 1)
+        actual_token = str(self.token_handler.get_actual_token(
+                                                        self.token_stream,
+                                                        ctx, 1))
         
         class_name = str(ctx.NAME())
         camel_case_regex = "([A-Z][a-z0-9]*)+"
@@ -62,7 +66,9 @@ class LinterListener(Python3Listener):
             
 
     def exitFuncdef(self, ctx:Python3Parser.FuncdefContext):
-        actual_token = self.token_handler.get_actual_token(self.token_stream, ctx, 1)
+        actual_token = str(self.token_handler.get_actual_token(
+                                                        self.token_stream,
+                                                        ctx, 1))
         
         func_name = str(ctx.NAME())
         lower_case_regex = re.compile("([a-z][a-z0-9_]*)+")

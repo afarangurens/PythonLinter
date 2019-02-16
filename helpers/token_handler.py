@@ -10,7 +10,7 @@ class TokenHandler:
         else:
             actual_token_index = initial_token_index
 
-        actual_token = str(token_stream.get(actual_token_index))
+        actual_token = token_stream.get(actual_token_index)
         
         return actual_token
         

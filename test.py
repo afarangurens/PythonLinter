@@ -1,5 +1,6 @@
-import sys 
+import sys
 
-class C1:
-    def funciOn_1():
-        lis_1 = 10
+class c1:
+    def FunciOn_1():
+        lis_1 = "huehuehuhuehue""huhuehuehuhuehuehuheeeeeeeeeeeeeeeeeeeeeeeeeee"
+        lis2 = "huehuehuhuehuehuhuehuehuhuehuehuhuehuehuhuehuehuhuehuehuhuehuehuhuehuehu"

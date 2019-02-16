@@ -3,7 +3,8 @@ from antlr4 import *
 from io import StringIO
 from typing.io import TextIO
 import sys
-
+sys.path.insert(0, './helpers')
+from linter_error_message import LinterErrorMessage
 
 from antlr4.Token import CommonToken
 import re
@@ -738,6 +739,7 @@ class Python3Lexer(Lexer):
     @lastToken.setter
     def lastToken(self, value):
         self._lastToken = value
+        self.line_max_len_convention()
 
     def reset(self):
         super().reset()
@@ -885,5 +887,42 @@ class Python3Lexer(Lexer):
             if predIndex == 0:
                 return self.atStartOfInput()
          
+    # Added for line max length management
+    def line_max_len_convention(self):
+        error_message = LinterErrorMessage()
+        last_token = self._lastToken
+        token_text = last_token.text
+        token_str = str(last_token)
+        token_max_col = self.last_token_max_column()
+
+        if token_max_col >= 80:
+            print(error_message.max_line_chars_error(token_str, token_text))
+    
+    def last_token_max_column(self):
+        last_token = self._lastToken
+        token_text = last_token.text
+        
+        if "EOF" in token_text:
+            token_len = 0
+        else:            
+            token_len = len(token_text)
+    
+        starting_column = self.get_token_starting_column()
+        token_max_column = starting_column + token_len
+
+        return token_max_column
+        
+    def get_token_starting_column(self):
+        last_token = str(self._lastToken)
+        token_line_column = last_token[-10:-1]
+        get_column_regex = ('(?<=:)(.*)')
+        
+        token_starting_col = int(re.findall(get_column_regex, 
+                                            token_line_column)[0])                                        
+        
+        return token_starting_col
+        
+
+        
 
 
