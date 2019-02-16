@@ -4,7 +4,7 @@ sys.path.insert(0, './helpers')
 
 
 class LinterErrorMessage:
-
+    
     def show_error_position(self, token_str):
         line_col_regex = ('((?<=,)([0-9]+[:][0-9]+)(?=]))')
         line_col = re.findall(line_col_regex, token_str)[0][0]
@@ -50,6 +50,13 @@ class LinterErrorMessage:
                             " format".format(error_position, func_name))
         return func_naming_error                            
     
+    def function_arglist_error(self, token_str):
+        error_position = self.show_error_position(token_str)
+
+        arglist_error = ("Style Error {} function has too many arguments"
+                         "(Max arguments sugested: 3)".format(error_position))
+        return arglist_error
+
     def name_to_avoid_error(self, var_name, token_str):
         error_position = self.show_error_position(token_str)
 

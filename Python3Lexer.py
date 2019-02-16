@@ -886,6 +886,7 @@ class Python3Lexer(Lexer):
     def NEWLINE_sempred(self, localctx:RuleContext, predIndex:int):
             if predIndex == 0:
                 return self.atStartOfInput()
+        
          
     # Added for line max length management
     def line_max_len_convention(self):
@@ -903,19 +904,18 @@ class Python3Lexer(Lexer):
         token_text = last_token.text
         
         if "EOF" in token_text:
-            token_len = 0
+            token_max_column = 0
         else:            
             token_len = len(token_text)
-    
-        starting_column = self.get_token_starting_column()
-        token_max_column = starting_column + token_len
-
+            starting_column = self.get_token_starting_column()
+            token_max_column = starting_column + token_len
+        
         return token_max_column
         
     def get_token_starting_column(self):
         last_token = str(self._lastToken)
-        token_line_column = last_token[-10:-1]
-        get_column_regex = ('(?<=:)(.*)')
+        token_line_column = last_token.split(",")[-1]
+        get_column_regex = ('(?<=:)(.*)(?=])')
         
         token_starting_col = int(re.findall(get_column_regex, 
                                             token_line_column)[0])                                        

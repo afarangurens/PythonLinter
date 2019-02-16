@@ -44,8 +44,10 @@ class LinterListener(Python3Listener):
 
             # Names to avoid validation for variables PEP8
             if var_name == "l" or var_name == "O" or var_name == "I":
-                self.linter_error_message.name_to_avoid_error(var_name,
-                                                              actual_token)
+                naming_error = self.linter_error_message.name_to_avoid_error(
+                                                                var_name,
+                                                                actual_token)
+                print(naming_error)                                                                
 
     def exitClassdef(self, ctx:Python3Parser.ClassdefContext):
         actual_token = str(self.token_handler.get_actual_token(
@@ -61,9 +63,6 @@ class LinterListener(Python3Listener):
         self.convention_checker.check_naming_convention(class_name,
                                                         camel_case_regex,
                                                         class_naming_error)
-        
-        
-            
 
     def exitFuncdef(self, ctx:Python3Parser.FuncdefContext):
         actual_token = str(self.token_handler.get_actual_token(
@@ -80,4 +79,17 @@ class LinterListener(Python3Listener):
                                                         lower_case_regex,
                                                         func_naming_error)
 
-            
+    def exitTypedargslist(self, ctx:Python3Parser.TypedargslistContext):
+        actual_token = str(self.token_handler.get_actual_token(
+                                                        self.token_stream,
+                                                        ctx, 0))
+        arglist = ctx.getText().split(",")
+        arglist_len = len(arglist)
+        arglist_error = self.linter_error_message.function_arglist_error(actual_token)
+
+        if "self" in arglist:
+            arglist_len -= 1
+
+        if arglist_len > 3:
+            print(arglist_error)
+        
