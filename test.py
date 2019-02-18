@@ -1,4 +1,5 @@
-import sys
+import sys, numpy
+
 
 class C1:
     def funciOn_1(self, a1, a2, a3):

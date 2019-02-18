@@ -27,4 +27,3 @@ class TokenHandler:
         next_token = token_stream.get(actual_token_index + 1)
 
         return next_token
-
