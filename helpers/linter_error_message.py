@@ -90,6 +90,7 @@ class LinterErrorMessage:
 
     def single_line_multiple_imports_error(self, token_str):
         error_position = self.show_error_position(token_str)
+        
         single_line_multiple_imports_error = ("Style error {}, cannot import"
                                               " more than one module per line"
                                               "".format(error_position))
