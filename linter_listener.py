@@ -20,8 +20,6 @@ class LinterListener(Python3Listener):
         self.token_handler = TokenHandler()
         self.linter_error_message = LinterErrorMessage()
         self.convention_checker = StyleConventionCheck 
-        
-        print("initializing context test with listener...")
 
     def exitAtom(self, ctx:Python3Parser.AtomContext):
         actual_token = str(self.token_handler.get_actual_token(

@@ -714,6 +714,14 @@ class Python3Lexer(Lexer):
                                      "<=", "!=", "+=", "-=", "*=", "@=", "/=",
                                      "%=", "&=", "|=", "^=", "<<=", 
                                      ">>=", "**=", "//="]
+        
+        #Added control variable to know if in function                                     
+        self.actual_function_len = 0
+        self.in_function = False
+        self.actual_function_indent = 0
+        self.function_line = 0
+        self.actual_line = 0
+
     @property
     def tokens(self):
         try:
@@ -761,7 +769,7 @@ class Python3Lexer(Lexer):
             self.line_max_len_convention()
             self.end_space_convention()
             self.start_end_space_convention()
-            #print(self.prev_and_last_tokens[0],self.prev_and_last_tokens[1])
+            self.function_len_convention()
 
     def reset(self):
         super().reset()
@@ -908,7 +916,7 @@ class Python3Lexer(Lexer):
                 return self.atStartOfInput()
         
          
-    ###Added for get column in token
+    ###Added for get column and line in token
     def token_starting_column(self, token):
         token_str = str(token)
         token_line_column = token_str.split(",")[-1]
@@ -918,18 +926,15 @@ class Python3Lexer(Lexer):
                                             token_line_column)[0])
         return token_starting_col
 
+    def token_line(self, token):
+        token_str = str(token)
+        token_line_column = token_str.split(",")[-1]
+        get_line_regex = ('(.*)(?=:)')
 
-    ### Added for line max length convention management
-    def line_max_len_convention(self):
-        last_token = self._lastToken
-        token_text = last_token.text
-        token_str = str(last_token)
-        token_max_col = self.token_max_column(last_token)
+        token_line = int(re.findall(get_line_regex, token_line_column)[0])
+        return token_line
 
-        if token_max_col > 79:
-            print(self.error_message.max_line_chars_error(token_str, 
-                                                          token_text))
-    
+    ### Added for line max length convention management    
     def token_max_column(self, token):
         token_str = str(token)
         token_text = token.text
@@ -942,8 +947,38 @@ class Python3Lexer(Lexer):
             token_max_column = starting_column + token_len
         return token_max_column
         
+    def line_max_len_convention(self):
+        last_token = self._lastToken
+        token_text = last_token.text
+        token_str = str(last_token)
+        token_max_col = self.token_max_column(last_token)
+
+        if token_max_col > 79:
+            print(self.error_message.max_line_chars_error(token_str, 
+                                                          token_text))
 
     ### Added for layout convention management
+    def start_stop_column_diff(self, token1, token2):
+        start_stop_col_diff = 0
+
+        token1_stop_col = self.token_max_column(token1)
+        token2_start_col = self.token_starting_column(token2)
+        
+        start_stop_col_diff = token2_start_col - token1_stop_col
+        return start_stop_col_diff
+
+    def update_previous_and_last_token(self):
+        last_token = self._lastToken
+        token_counter = self.token_counter
+        
+        if token_counter == 1:
+            self.actual_token = last_token
+        elif token_counter > 1:
+            self.prev_and_last_tokens[0] = self.actual_token
+            self.prev_and_last_tokens[1] = last_token
+
+        self.actual_token = last_token
+
     def end_space_convention(self):
         token1 = self.prev_and_last_tokens[0]
         token2 = self.prev_and_last_tokens[1]
@@ -967,26 +1002,62 @@ class Python3Lexer(Lexer):
             and (tok2_tok1_col_diff == 0):
             print(self.error_message.operator_space_error(str(token1), 
                                                           token1.text))
-
-    def start_stop_column_diff(self, token1, token2):
-        start_stop_col_diff = 0
-
-        token1_stop_col = self.token_max_column(token1)
-        token2_start_col = self.token_starting_column(token2)
-        
-        start_stop_col_diff = token2_start_col - token1_stop_col
-        return start_stop_col_diff
-
-    def update_previous_and_last_token(self):
-        last_token = self._lastToken
-        token_counter = self.token_counter
-        
-        if token_counter == 1:
-            self.actual_token = last_token
-        elif token_counter > 1:
-            self.prev_and_last_tokens[0] = self.actual_token
-            self.prev_and_last_tokens[1] = last_token
-
-        self.actual_token = last_token
-
     
+    ### Added for function size convention management
+    def enter_function(self):
+        last_token = self._lastToken
+
+        if last_token.text == "def":
+            self.in_function = True
+            self.actual_function_indent = self.indents[-1]
+            self.function_line = self.token_line(last_token)
+
+    def exit_function(self):
+        self.in_function = False
+        self.actual_function_indent = self.indents[-1]
+        self.actual_line = 0
+        self.actual_function_len = 0
+    
+    def get_function_len(self):
+        last_token = self._lastToken
+        actual_token_line = self.token_line(last_token)
+        function_len = 0
+
+        if actual_token_line > self.actual_line:
+            function_len += 1
+            self.actual_line = actual_token_line
+        
+        return function_len           
+
+    def check_still_function(self):
+        last_token = self._lastToken
+        token_line = self.token_line(last_token)
+
+        in_function = self.in_function
+        function_indent = self.actual_function_indent
+        actual_indent = self.indents[-1]
+        
+        if (in_function == True) and (token_line == self.function_line):
+            pass
+        elif (in_function == True) and (actual_indent > function_indent):
+            return True
+        else:
+            self.exit_function()
+        
+    def update_function_len(self):
+        is_function = self.check_still_function()
+
+        if is_function == True:
+            self.actual_function_len += self.get_function_len()
+        
+    def function_len_convention(self):
+
+        if len(self.indents) > 0:    
+            self.enter_function()
+            self.update_function_len()
+            
+            if self.actual_function_len > 25:
+                self.exit_function()
+                print(self.error_message.function_len_error(str(self._lastToken),
+                                                            self.function_line))
+        

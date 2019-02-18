@@ -1,19 +1,42 @@
-from antlr4 import *
-from Python3Lexer import Python3Lexer
-from Python3Parser import Python3Parser
-from linter_listener import LinterListener
+import sys
 
-def main():
-    input = FileStream("test.py")
-    lexer = Python3Lexer(input)
-    stream = CommonTokenStream(lexer)
-    parser = Python3Parser(stream)
-    tree = parser.file_input()
+class C1:
+    def funciOn_1(self, a1, a2, a3):
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
     
-    linter_listener = LinterListener(stream)
-    walker = ParseTreeWalker()
-    walker.walk(linter_listener,tree)
+    def asd():
+        print("hi")
 
-
-if __name__ == '__main__':
-    Main = 0
+    def funciOn_1(self, a1, a2, a3):
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 11111111111111111111111111111111111111111111111111111111111
+        if x:
+            li = "huehuehuhuehue""huehwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
+            asd = 11111111111111111111111111111111111111111111111111111111111111111111111111111111111 def x():

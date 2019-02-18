@@ -23,8 +23,8 @@ class LinterErrorMessage:
     def max_line_chars_error(self, token_str, token_text):
         error_position = self.show_error_position(token_str)
 
-        max_char_error = ("Style Error: {} {} exceedes the 79 maximum line"
-                          " characters ".format(token_text, error_position))
+        max_char_error = ("Style Error {}, '{}' exceedes the 79 maximum line"
+                          " characters ".format(error_position, token_text))
         return max_char_error                          
 
     def indentation_error(self, token_str):
@@ -71,6 +71,14 @@ class LinterErrorMessage:
         comma_space_error = ("Style Error {}, missing a blank space"
                             " after '{}'".format(error_position, symbol))
         return comma_space_error
+
+    def function_len_error(self, token_str, function_line):
+        error_position = self.show_error_position(token_str)
+        
+        func_len_error = ("Style Error {}, function defined at line {}"
+                          " has more than 25 lines".format(error_position,
+                                                           function_line))
+        return func_len_error
 
     def const_naming_error():
         error_position = self.show_error_position(token_str)
