@@ -13,4 +13,4 @@ class TokenHandler:
         actual_token = token_stream.get(actual_token_index)
         
         return actual_token
-        
+

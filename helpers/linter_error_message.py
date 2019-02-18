@@ -58,10 +58,17 @@ class LinterErrorMessage:
                             " ('l', 'O', I)".format(error_position, var_name))
         return avoid_name_error     
 
-    def const_naming_error():
+    def const_naming_error(self, token_str):
         error_position = self.show_error_position(token_str)
 
         const_naming_error = ("Style Error {}, the constant '{}' is"
                              " not using UPERCASE-separated by underscore"
                              " format".format(error_position, var_name))
         return const_naming_error
+
+    def single_line_multiple_imports_error(self, token_str):
+        error_position = self.show_error_position(token_str)
+        single_line_multiple_imports_error = ("Style error {}, cannot import"
+                                              " more than one module per line"
+                                              "".format(error_position))
+        return single_line_multiple_imports_error

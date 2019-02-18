@@ -4,6 +4,7 @@ sys.path.insert(0, './helpers')
 import re
 import numpy as np
 from Python3Lexer import Python3Lexer
+
 from Python3Parser import Python3Parser
 from Python3Listener import Python3Listener
 from linter_error_message import LinterErrorMessage
@@ -61,9 +62,6 @@ class LinterListener(Python3Listener):
         self.convention_checker.check_naming_convention(class_name,
                                                         camel_case_regex,
                                                         class_naming_error)
-        
-        
-            
 
     def exitFuncdef(self, ctx:Python3Parser.FuncdefContext):
         actual_token = str(self.token_handler.get_actual_token(
@@ -80,4 +78,12 @@ class LinterListener(Python3Listener):
                                                         lower_case_regex,
                                                         func_naming_error)
 
-            
+    def exitImport_name(self, ctx:Python3Parser.Import_nameContext):
+        actual_token = str(self.token_handler.get_actual_token(
+                                                        self.token_stream,
+                                                        ctx, 1))
+        print(str(ctx.getText()))
+        if ',' in ctx.getText():
+            import_name_error = self.linter_error_message.single_line_multiple_imports_error(actual_token)
+            print(import_name_error)
+
