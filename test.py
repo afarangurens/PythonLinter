@@ -1,6 +1,19 @@
-import sys
+from antlr4 import *
+from Python3Lexer import Python3Lexer
+from Python3Parser import Python3Parser
+from linter_listener import LinterListener
 
-class c1:
-    def FunciOn_1(self, a1, a2, a3, a4):
-        l = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""ha"
-        List = 11111111111111111111111111111111111111111111111111111111111111111
+def main():
+    input = FileStream("test.py")
+    lexer = Python3Lexer(input)
+    stream = CommonTokenStream(lexer)
+    parser = Python3Parser(stream)
+    tree = parser.file_input()
+    
+    linter_listener = LinterListener(stream)
+    walker = ParseTreeWalker()
+    walker.walk(linter_listener,tree)
+
+
+if __name__ == '__main__':
+    Main = 0

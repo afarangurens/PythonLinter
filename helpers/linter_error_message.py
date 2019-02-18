@@ -65,6 +65,13 @@ class LinterErrorMessage:
                             " ('l', 'O', I)".format(error_position, var_name))
         return avoid_name_error     
 
+    def operator_space_error(self, token_str, symbol):
+        error_position = self.show_error_position(token_str)
+        
+        comma_space_error = ("Style Error {}, missing a blank space"
+                            " after '{}'".format(error_position, symbol))
+        return comma_space_error
+
     def const_naming_error():
         error_position = self.show_error_position(token_str)
 

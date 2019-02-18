@@ -17,23 +17,22 @@ class LinterListener(Python3Listener):
         self.variable = True
         self.token_stream = token_stream
         
-        self.token_handler = TokenHandler
+        self.token_handler = TokenHandler()
         self.linter_error_message = LinterErrorMessage()
         self.convention_checker = StyleConventionCheck 
         
         print("initializing context test with listener...")
 
     def exitAtom(self, ctx:Python3Parser.AtomContext):
-        
         actual_token = str(self.token_handler.get_actual_token(
                                                         self.token_stream,
                                                         ctx, 0))
-    
+        next_token = self.token_handler.get_next_token(self.token_stream,
+                                                       ctx, 0)
         var_name = str(ctx.NAME())
         lower_case_regex = "([a-z][a-z0-9_]*)+"
 
-        if var_name != "None":
-
+        if (var_name != "None") and (next_token.text != "("):
             # Lower case validation for variables PEP8
             var_naming_error = self.linter_error_message.variable_naming_error(
                                                                     var_name, 
@@ -92,4 +91,4 @@ class LinterListener(Python3Listener):
 
         if arglist_len > 3:
             print(arglist_error)
-        
+    

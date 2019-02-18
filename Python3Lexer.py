@@ -689,7 +689,7 @@ class Python3Lexer(Lexer):
                   "SHORT_BYTES_CHAR_NO_DOUBLE_QUOTE", "LONG_BYTES_CHAR", 
                   "BYTES_ESCAPE_SEQ", "SPACES", "COMMENT", "LINE_JOINING", 
                   "ID_START", "ID_CONTINUE" ]
-
+        
     grammarFileName = "Python3.g4"
 
     def __init__(self, input=None, output:TextIO = sys.stdout):
@@ -698,8 +698,22 @@ class Python3Lexer(Lexer):
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
+        
+        #error manager 
+        self.error_message = LinterErrorMessage()
+        
+        #Added variables for token control
+        self.token_counter = 0
+        self.actual_token = ""
+        self.prev_and_last_tokens = [0, 0]
 
-
+        #Added dict for layout convention
+        self.space_convention_symbols = ["or", "and", "not", "is", "*", 
+                                     "**", "=", "<<", ">>", "+", "-", "/", 
+                                     "%", "//", "~", "<", ">", "==", ">=", 
+                                     "<=", "!=", "+=", "-=", "*=", "@=", "/=",
+                                     "%=", "&=", "|=", "^=", "<<=", 
+                                     ">>=", "**=", "//="]
     @property
     def tokens(self):
         try:
@@ -739,7 +753,15 @@ class Python3Lexer(Lexer):
     @lastToken.setter
     def lastToken(self, value):
         self._lastToken = value
-        self.line_max_len_convention()
+        self.prev_and_last_tokens = [self._lastToken, self._lastToken]
+        self.token_counter += 1
+        
+        if ("EOF" not in self._lastToken.text):    
+            self.update_previous_and_last_token()
+            self.line_max_len_convention()
+            self.end_space_convention()
+            self.start_end_space_convention()
+            #print(self.prev_and_last_tokens[0],self.prev_and_last_tokens[1])
 
     def reset(self):
         super().reset()
@@ -779,8 +801,7 @@ class Python3Lexer(Lexer):
         start = (stop - len(text) + 1) if text else stop
         return CommonToken(self._tokenFactorySourcePair, type, super().DEFAULT_TOKEN_CHANNEL, start, stop)
 
-    @staticmethod
-    def getIndentationCount(spaces):
+    def getIndentationCount(self, spaces):
         count = 0
         for ch in spaces:
             if ch == '\t':
@@ -841,7 +862,6 @@ class Python3Lexer(Lexer):
                         self.indents.pop()
                 
      
-
     def OPEN_PAREN_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 1:
             self.opened += 1
@@ -888,41 +908,85 @@ class Python3Lexer(Lexer):
                 return self.atStartOfInput()
         
          
-    # Added for line max length management
+    ###Added for get column in token
+    def token_starting_column(self, token):
+        token_str = str(token)
+        token_line_column = token_str.split(",")[-1]
+        get_column_regex = ('(?<=:)(.*)(?=])')
+        
+        token_starting_col = int(re.findall(get_column_regex, 
+                                            token_line_column)[0])
+        return token_starting_col
+
+
+    ### Added for line max length convention management
     def line_max_len_convention(self):
-        error_message = LinterErrorMessage()
         last_token = self._lastToken
         token_text = last_token.text
         token_str = str(last_token)
-        token_max_col = self.last_token_max_column()
+        token_max_col = self.token_max_column(last_token)
 
-        if token_max_col >= 80:
-            print(error_message.max_line_chars_error(token_str, token_text))
+        if token_max_col > 79:
+            print(self.error_message.max_line_chars_error(token_str, 
+                                                          token_text))
     
-    def last_token_max_column(self):
-        last_token = self._lastToken
-        token_text = last_token.text
+    def token_max_column(self, token):
+        token_str = str(token)
+        token_text = token.text
         
         if "EOF" in token_text:
             token_max_column = 0
         else:            
             token_len = len(token_text)
-            starting_column = self.get_token_starting_column()
+            starting_column = self.token_starting_column(token_str)
             token_max_column = starting_column + token_len
-        
         return token_max_column
         
-    def get_token_starting_column(self):
-        last_token = str(self._lastToken)
-        token_line_column = last_token.split(",")[-1]
-        get_column_regex = ('(?<=:)(.*)(?=])')
-        
-        token_starting_col = int(re.findall(get_column_regex, 
-                                            token_line_column)[0])                                        
-        
-        return token_starting_col
-        
 
+    ### Added for layout convention management
+    def end_space_convention(self):
+        token1 = self.prev_and_last_tokens[0]
+        token2 = self.prev_and_last_tokens[1]
+        tok2_tok1_col_diff = self.start_stop_column_diff(token1, token2)
         
+        if ((token1.text == ":") or (token1.text == ";")\
+            or (token1.text == ",")) and (tok2_tok1_col_diff == 0):
+            print(self.error_message.operator_space_error(str(token1), 
+                                                          token1.text))
 
+    def start_end_space_convention(self):
+        token1 = self.prev_and_last_tokens[0]
+        token2 = self.prev_and_last_tokens[1]
+        tok2_tok1_col_diff = self.start_stop_column_diff(token1, token2)
+        
+        if (token1.text in self.space_convention_symbols)\
+            and (tok2_tok1_col_diff == 0):
+            print(self.error_message.operator_space_error(str(token1), 
+                                                          token1.text))
+        if (token2.text in self.space_convention_symbols)\
+            and (tok2_tok1_col_diff == 0):
+            print(self.error_message.operator_space_error(str(token1), 
+                                                          token1.text))
 
+    def start_stop_column_diff(self, token1, token2):
+        start_stop_col_diff = 0
+
+        token1_stop_col = self.token_max_column(token1)
+        token2_start_col = self.token_starting_column(token2)
+        
+        start_stop_col_diff = token2_start_col - token1_stop_col
+        return start_stop_col_diff
+
+    def update_previous_and_last_token(self):
+        last_token = self._lastToken
+        token_counter = self.token_counter
+        
+        if token_counter == 1:
+            self.actual_token = last_token
+        elif token_counter > 1:
+            self.prev_and_last_tokens[0] = self.actual_token
+            self.prev_and_last_tokens[1] = last_token
+
+        self.actual_token = last_token
+
+    
