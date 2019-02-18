@@ -1,12 +1,12 @@
 
-###
 ### Code to try linter errors
-import sys, os
+import sys
+import os
 
-class class_1:
-    def ADD_four(self, a, b, c,d):
-        Sum= a+b+c + d
-        l = "the sum is:"
+class Class1:
+    def add_four(self, a, b, c):
+        sum1 = a + b + c 
+        message = "the sum is:"
 
     def too_long_function(self):
         print("nope")
@@ -18,7 +18,8 @@ class class_1:
 
         print("nope")
         print("nope")
-        print("too long string too long string too long string too long string")
+        print("too long string too long string too long string too long string"
+              " too long string")
         print("nope")
         print("nope")
         print("nope")
