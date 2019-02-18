@@ -95,7 +95,6 @@ class LinterListener(Python3Listener):
         actual_token = str(self.token_handler.get_actual_token(
                                                         self.token_stream,
                                                         ctx, 1))
-        print(str(ctx.getText()))
         if ',' in ctx.getText():
             import_name_error = self.linter_error_message.single_line_multiple_imports_error(actual_token)
             print(import_name_error)

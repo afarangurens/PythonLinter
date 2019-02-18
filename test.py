@@ -7,7 +7,7 @@ class C1:
         print("")
     def func_ASD(self, a1, a2, a3):
         if x:
-            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
-            xist = 11111111111111111111111111111111111111111111111111111111111
+            li = "huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""huehuehuhuehue""huehuehuhuehue"
+            xist = 111111111111111111111111111111111111111111111111111111111111111111111
     
    
